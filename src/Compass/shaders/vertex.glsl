@@ -1,25 +1,15 @@
-uniform float time;
-uniform float intensity;
-
 varying vec2 vUvs;
+varying vec3 vPosition;
 
-float inverseLerp(float v, float minValue, float maxValue) {
-  return (v - minValue) / (maxValue - minValue);
-}
-
-float remap(float v, float inMin, float inMax, float outMin, float outMax) {
-  float t = inverseLerp(v, inMin, inMax);
-  return mix(outMin, outMax, t);
-}
 
 void main() {	
-  float factor = remap(intensity, 0.0, 1.0, 0.0, 25.0);
-  vec3 localSpacePosition = position;
+  // Position
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
-  vec4 modelPosition = modelViewMatrix * vec4(localSpacePosition, 1.0);
-  modelPosition.x += sin(modelPosition.y + time * 5.0) * factor;
-  // modelPosition.x += sin(modelPosition.y + time * 2.5) * 25.0;
+  // Final Position
+  gl_Position = projectionMatrix * viewMatrix * modelPosition;
 
-  gl_Position = projectionMatrix * modelPosition;
+  // Varyings
   vUvs = uv;
+  vPosition = modelPosition.xyz;
 }

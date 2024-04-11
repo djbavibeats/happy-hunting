@@ -1,22 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Canvas, extend, useFrame, useLoader } from '@react-three/fiber'
-import { useAspect, useVideoTexture, shaderMaterial } from '@react-three/drei'
+import { useAspect, useVideoTexture, shaderMaterial, OrbitControls } from '@react-three/drei'
 import Slider from 'react-input-slider'
 import { TextureLoader } from 'three'
+import * as THREE from 'three'
 
-import vertex from './shaders/vertex.glsl'
-import fragment from './shaders/fragment.glsl'
+import vertex from './shaders/hologram/vertex.glsl'
+import fragment from './shaders/hologram/fragment.glsl'
 
 const VideoShaderMaterial = shaderMaterial(
     {
         diffuse: null,
-        time: 0.0,
+        uTime: 0.0,
         intensity: 1.0
     },
     vertex,
     fragment
 )
 extend({ VideoShaderMaterial })
+
 
 const UserInterface = ({ activeCamera, value, setValue }) => {
     return (<div className="w-full absolute bottom-8 left-0 right-0 gap-4 flex flex-col items-center justify-center">
@@ -54,7 +56,9 @@ const Scene = ({ camerastream, value }) => {
     }, [ value ])
 
     useFrame((state, delta) => {
-        streammesh.current.material.time = state.clock.elapsedTime
+        streammesh.current.material.uTime = state.clock.elapsedTime
+        // streammesh.current.rotation.x = state.clock.elapsedTime * 0.25
+        // streammesh.current.rotation.y = state.clock.elapsedTime * - 0.5
     })
 
     useEffect(() => {
@@ -65,12 +69,15 @@ const Scene = ({ camerastream, value }) => {
     }, [ window.innerWidth, window.innerHeight ])
 
     const size = useAspect(sizes.width, sizes.height)
-    return (
-        <mesh scale={ size } ref={ streammesh }>
+    return (<>
+        <mesh scale={ 8.5 } ref={ streammesh }>
             <planeGeometry />
-            <videoShaderMaterial />
+            <videoShaderMaterial 
+                transparent={ true }
+                side={ THREE.DoubleSide }
+            />
         </mesh>
-    )
+    </>)
 }
 
 export default function Compass() {
@@ -82,11 +89,16 @@ export default function Compass() {
     }
 
     return (<>
-        <Canvas orthographic>
+        <div className="frame">
+            <div className="clip">
+        <Canvas>
+            {/* <OrbitControls /> */}
             { camerastream &&
                 <Scene activeCamera={ activeCamera } camerastream={ camerastream } value={ value } />
             }
         </Canvas>
+            </div>
+        </div>
         <UserInterface activeCamera={ activeCamera } value={ value } setValue={ setValue } />
     </>)
 }
