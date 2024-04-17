@@ -71,7 +71,7 @@ const Scene = ({ camerastream, value }) => {
     const size = useAspect(sizes.width, sizes.height)
     return (<>
         <mesh scale={ 8.5 } ref={ streammesh }>
-            <planeGeometry />
+            <planeGeometry  />
             <videoShaderMaterial 
                 transparent={ true }
                 side={ THREE.DoubleSide }
@@ -83,22 +83,31 @@ const Scene = ({ camerastream, value }) => {
 export default function Compass() {
     const [ camerastream, setCameraStream ] = useState()
     const [ value, setValue ] = useState({ x: 0.0 })
+    const [ orientationAccessGranted, setOrientationAccessGranted ] = useState("pending")
+    const [ heading, setHeading ] = useState()
+    const [ compassHeader, setCompassHeader ] = useState()
+    const [ orientation, setOrientation ] = useState({
+        z: 0.0,
+        x: 0.0,
+        y: 0.0
+    })
 
     const activeCamera = async () => {
         setCameraStream(await navigator.mediaDevices.getUserMedia({ video: true }))
     }
 
     return (<>
+        {/*
         <div className="frame">
             <div className="clip">
-        <Canvas>
-            {/* <OrbitControls /> */}
-            { camerastream &&
-                <Scene activeCamera={ activeCamera } camerastream={ camerastream } value={ value } />
-            }
-        </Canvas>
+            <Canvas>
+                { camerastream &&
+                    <Scene activeCamera={ activeCamera } camerastream={ camerastream } value={ value } />
+                }
+            </Canvas>
             </div>
         </div>
         <UserInterface activeCamera={ activeCamera } value={ value } setValue={ setValue } />
+        */}
     </>)
 }

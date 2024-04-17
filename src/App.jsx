@@ -1,4 +1,4 @@
-import Compass from './Compass'
+import Compass from './Compass/compass.jsx'
 function App() {
   return (
       <Compass />
